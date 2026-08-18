@@ -16,7 +16,7 @@ function Keyboard() {
   const t = useTheme()
   const isNight = useRoomStore((state) => state.isNight)
   const [rgbOn, setRgbOn] = useState(false)
-  const { groupRef, bind } = useInteractive('keyboard', () => setRgbOn((v) => !v))
+  const { groupRef, bind } = useInteractive(() => setRgbOn((v) => !v))
 
   // 键帽网格：14 列 x 4 行，底行为空格键
   const keys = useMemo(() => {
@@ -69,7 +69,7 @@ function Keyboard() {
 function Mouse() {
   const t = useTheme()
   const [ledOn, setLedOn] = useState(false)
-  const { groupRef, bind } = useInteractive('mouse', () => {
+  const { groupRef, bind } = useInteractive(() => {
     setLedOn((v) => !v)
     if (!groupRef.current) return
     // 按压回弹
@@ -124,7 +124,7 @@ function Mouse() {
 /** 桌面音响 */
 function Speaker({ x }: { x: number }) {
   const toggle = useStereoPlayer((state) => state.toggle)
-  const { groupRef, bind } = useInteractive('speaker', () => {
+  const { groupRef, bind } = useInteractive(() => {
     toggle()
     if (!groupRef.current) return
     // 低音震动一下
@@ -167,7 +167,7 @@ export function Desk() {
 
 /** 电竞椅：气压杆清晰可见，点击转一圈 */
 export function Chair() {
-  const { groupRef, bind } = useInteractive('chair', () => {
+  const { groupRef, bind } = useInteractive(() => {
     if (!groupRef.current) return
     gsap.to(groupRef.current.rotation, { y: '+=6.2832', duration: 1.1, ease: 'power2.inOut' })
   })
@@ -237,7 +237,7 @@ export function Rug() {
 
 /** 小沙发（正对电视，点击弹跳） */
 export function Sofa() {
-  const { groupRef, bind } = useInteractive('sofa', () => {
+  const { groupRef, bind } = useInteractive(() => {
     if (!groupRef.current) return
     gsap.fromTo(
       groupRef.current.scale,
@@ -295,7 +295,7 @@ export function Bookshelf() {
   const [selectedCover, setSelectedCover] = useState<number | null>(null)
   const [isReturning, setIsReturning] = useState(false)
   const coverRef = useRef<Group>(null)
-  const { groupRef, bind } = useInteractive('bookshelf', () => {
+  const { groupRef, bind } = useInteractive(() => {
     if (isReturning) return
 
     if (selectedCover === null) {
@@ -409,7 +409,7 @@ function Can({ position, fill }: { position: [number, number, number]; fill: str
 export function Fridge() {
   const [open, setOpen] = useState(false)
   const doorRef = useRef<Group>(null)
-  const { groupRef, bind } = useInteractive('fridge', () => setOpen((v) => !v))
+  const { groupRef, bind } = useInteractive(() => setOpen((v) => !v))
 
   useEffect(() => {
     if (!doorRef.current) return
@@ -499,7 +499,7 @@ function ChipBag({ position, rotation }: { position: [number, number, number]; r
 export function SnackCabinet() {
   const [open, setOpen] = useState(false)
   const drawerRefs = useRef<(Group | null)[]>([])
-  const { groupRef, bind } = useInteractive('snack', () => {
+  const { groupRef, bind } = useInteractive(() => {
     setOpen((value) => !value)
   })
 

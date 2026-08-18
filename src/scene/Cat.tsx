@@ -16,7 +16,7 @@ function randomSpot() {
 export function Cat() {
   const tailRef = useRef<Group>(null)
 
-  const { groupRef, bind } = useInteractive('cat', () => {
+  const { groupRef, bind } = useInteractive(() => {
     const g = groupRef.current
     if (!g) return
     // 点击：原地跳一下

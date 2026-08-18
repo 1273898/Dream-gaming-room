@@ -9,7 +9,7 @@ const COLOR = ACCENT.monitor
 /** 显示器：点击切换游戏画面 */
 export function Monitor() {
   const [on, setOn] = useState(false)
-  const { groupRef, hovered, bind } = useInteractive('monitor', () => setOn((v) => !v))
+  const { groupRef, hovered, bind } = useInteractive(() => setOn((v) => !v))
   const lit = on || hovered
 
   return (

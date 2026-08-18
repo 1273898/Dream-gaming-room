@@ -30,7 +30,7 @@ function PosterImage({ slot }: { slot: PosterSlot }) {
     })
   }, [rawTextures, slot.size])
 
-  const { bind } = useInteractive('poster', () => {
+  const { bind } = useInteractive(() => {
     setIndex((i) => (i + 1) % textures.length)
   })
 

@@ -8,7 +8,6 @@ import { Devices } from './scene/devices'
 import { Cat } from './scene/Cat'
 import { FloatingLyrics, LyricFontPreload } from './scene/FloatingLyrics'
 import { Hud } from './ui/Hud'
-import { TopInfo } from './ui/TopInfo'
 import { StereoConsole } from './ui/StereoConsole'
 import { useTheme } from './scene/linework'
 
@@ -46,7 +45,6 @@ export default function App() {
         </Suspense>
       </Canvas>
       <Hud />
-      <TopInfo />
       <StereoConsole />
     </>
   )

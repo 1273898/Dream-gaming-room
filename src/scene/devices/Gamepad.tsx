@@ -7,7 +7,7 @@ const COLOR = ACCENT.gamepad
 
 /** 手柄：点击后悬浮旋转一圈再落回 */
 export function Gamepad() {
-  const { groupRef, hovered, bind } = useInteractive('gamepad', () => {
+  const { groupRef, hovered, bind } = useInteractive(() => {
     const g = groupRef.current
     if (!g) return
     gsap.killTweensOf([g.position, g.rotation])

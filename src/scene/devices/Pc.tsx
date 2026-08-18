@@ -48,7 +48,7 @@ function CaseFan({ y, lit, spinning }: { y: number; lit: boolean; spinning: bool
 export function Pc() {
   const t = useTheme()
   const [powerOn, setPowerOn] = useState(false)
-  const { groupRef, hovered, bind } = useInteractive('pc', () => setPowerOn((v) => !v))
+  const { groupRef, hovered, bind } = useInteractive(() => setPowerOn((v) => !v))
   const lit = powerOn || hovered
 
   return (

@@ -37,7 +37,7 @@ function Curtain() {
   const leftRef = useRef<Group>(null)
   const rightRef = useRef<Group>(null)
 
-  const { groupRef, bind } = useInteractive('curtain', () => setOpen((v) => !v))
+  const { groupRef, bind } = useInteractive(() => setOpen((v) => !v))
 
   useEffect(() => {
     // 合上：两片 0.95 宽各占半边，完整覆盖 1.8 的窗；打开：收拢到两侧
@@ -111,7 +111,7 @@ function WindowFrame() {
 function WallSwitch() {
   const leverRef = useRef<Mesh>(null)
   const toggleNight = useRoomStore((s) => s.toggleNight)
-  const { groupRef, bind } = useInteractive('switch', () => toggleNight())
+  const { groupRef, bind } = useInteractive(() => toggleNight())
 
   useEffect(() => {
     const unsub = useRoomStore.subscribe((s) => {

@@ -10,7 +10,7 @@ const COLOR = ACCENT.tv
 export function ConsoleStation() {
   const t = useTheme()
   const [on, setOn] = useState(false)
-  const { groupRef, hovered, bind } = useInteractive('tv', () => setOn((v) => !v))
+  const { groupRef, hovered, bind } = useInteractive(() => setOn((v) => !v))
   const lit = on || hovered
 
   return (

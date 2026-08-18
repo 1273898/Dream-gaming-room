@@ -1,7 +1,11 @@
-* {
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  /* 全站统一隐藏系统光标，由 .cursor-dot 接管 */
+  cursor: none !important;
 }
 
 html,
@@ -54,71 +58,7 @@ canvas {
   color: #77777f;
 }
 
-/* ---------- 顶部信息条 ---------- */
-.top-info {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translate(-50%, -140%);
-  max-width: min(680px, 92vw);
-  display: flex;
-  align-items: baseline;
-  gap: 14px;
-  background: rgba(255, 255, 255, 0.96);
-  border: 1.5px solid #1a1a1a;
-  border-radius: 12px;
-  padding: 12px 44px 12px 20px;
-  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-  z-index: 10;
-}
-
-.top-info.open {
-  transform: translate(-50%, 0);
-}
-
-.top-info.night {
-  background: rgba(30, 30, 38, 0.96);
-  border-color: #e8e8ee;
-  color: #e8e8ee;
-}
-
-.top-info strong {
-  font-size: 15px;
-  letter-spacing: 2px;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.top-info span {
-  font-size: 13px;
-  line-height: 1.7;
-  color: #555;
-}
-
-.top-info.night span {
-  color: #b8b8c0;
-}
-
-.top-info-close {
-  position: absolute;
-  top: 8px;
-  right: 10px;
-  width: 24px;
-  height: 24px;
-  border: 1.5px solid currentColor;
-  border-radius: 50%;
-  background: transparent;
-  color: inherit;
-  font-size: 11px;
-  cursor: pointer;
-  opacity: 0.6;
-  transition: opacity 0.2s;
-}
-
-.top-info-close:hover {
-  opacity: 1;
-}
-
+/* ---------- 音响控制台 ---------- */
 .stereo-console {
   position: fixed;
   bottom: 24px;
