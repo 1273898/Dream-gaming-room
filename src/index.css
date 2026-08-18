@@ -13,43 +13,30 @@ body,
   background: #fafafa;
   font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
   color: #1a1a1a;
+  cursor: none;
 }
 
 canvas {
   display: block;
 }
 
-/* ---------- HUD ---------- */
-.hud-title {
+/* ---------- 自定义光标 ---------- */
+.cursor-dot {
   position: fixed;
-  top: 24px;
-  left: 28px;
+  top: 0;
+  left: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #1a1a1a;
   pointer-events: none;
-  user-select: none;
-  z-index: 5;
+  z-index: 999;
+  will-change: transform;
+  transition: background 0.3s;
+  mix-blend-mode: difference;
 }
 
-.hud-title h1 {
-  font-size: 20px;
-  font-weight: 600;
-  letter-spacing: 2px;
-}
-
-.hud-title p {
-  margin-top: 4px;
-  font-size: 12px;
-  color: #888;
-  letter-spacing: 1px;
-}
-
-.hud-title.night h1 {
-  color: #e8e8ee;
-}
-
-.hud-title.night p {
-  color: #77777f;
-}
-
+/* ---------- HUD ---------- */
 .hud-hint {
   position: fixed;
   bottom: 24px;

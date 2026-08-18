@@ -4,13 +4,9 @@
 
 ## 截图预览
 
-| 房间全景（白天） | 浮动歌词 |
+| 白天 | 黑夜 |
 | :---: | :---: |
-| ![房间全景](docs/screenshots/overview-day.png) | ![浮动歌词](docs/screenshots/floating-lyrics.png) |
-
-| 书架交互 · 信息气泡 | RGB 流光键盘 |
-| :---: | :---: |
-| ![书架交互](docs/screenshots/bookshelf-info.png) | ![RGB 灯带](docs/screenshots/rgb-strip.png) |
+| ![白天](docs/screenshots/overview-day.png) | ![黑夜](docs/screenshots/overview-night.png) |
 
 ## 功能特性
 
