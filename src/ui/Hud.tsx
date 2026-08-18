@@ -1,9 +1,10 @@
 import { useEffect, useRef } from 'react'
 import { useRoomStore } from '../store'
 
-/** 自定义光标：简约圆点，跟随鼠标 */
+/** 自定义光标：简约圆点，跟随鼠标；夜间带荧光效果 */
 function CursorDot() {
   const dotRef = useRef<HTMLDivElement>(null)
+  const isNight = useRoomStore((s) => s.isNight)
 
   useEffect(() => {
     const onMove = (e: PointerEvent) => {
@@ -14,7 +15,7 @@ function CursorDot() {
     return () => window.removeEventListener('pointermove', onMove)
   }, [])
 
-  return <div ref={dotRef} className="cursor-dot" />
+  return <div ref={dotRef} className={`cursor-dot${isNight ? ' night' : ''}`} />
 }
 
 export function Hud() {

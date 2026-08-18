@@ -36,8 +36,17 @@ canvas {
   pointer-events: none;
   z-index: 999;
   will-change: transform;
-  transition: background 0.3s;
+  transition: background 0.3s, box-shadow 0.3s;
   mix-blend-mode: difference;
+}
+
+/* 夜间荧光：青色圆点 + 多层光晕 */
+.cursor-dot.night {
+  background: #7ef9ff;
+  box-shadow:
+    0 0 6px rgba(126, 249, 255, 0.9),
+    0 0 14px rgba(126, 249, 255, 0.6),
+    0 0 26px rgba(126, 249, 255, 0.35);
 }
 
 /* ---------- HUD ---------- */
