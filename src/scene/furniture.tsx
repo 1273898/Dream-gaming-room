@@ -82,27 +82,24 @@ function Mouse() {
 
   return (
     <group ref={groupRef} position={[0.75, 0.81, 0.15]} {...bind}>
-      {/* 仅放大视觉子组，交互组保持 1:1 以保留鼠标的悬停和按压动画。 */}
-      <group scale={[2, 2, 2]}>
-        {/* 椭圆薄底盘（手握部分与底座同一椭圆轮廓） */}
-        <mesh position={[0, 0.011, 0]} scale={[0.085, 1, 0.13]}>
-          <cylinderGeometry args={[1, 1, 0.022, 28]} />
-          <meshBasicMaterial color={t.fill} polygonOffset polygonOffsetFactor={1} polygonOffsetUnits={1} />
-          <Edges threshold={20} color={t.line} />
-        </mesh>
-        {/* 一体式拱背：从底盘顶缘一体升起的曲面，手握部分 */}
-        <mesh position={[0, 0.022, 0]} scale={[0.085, 0.05, 0.13]}>
-          <sphereGeometry args={[1, 28, 18, 0, Math.PI * 2, 0, Math.PI / 2]} />
-          <meshBasicMaterial color={t.fill} polygonOffset polygonOffsetFactor={1} polygonOffsetUnits={1} />
-          <Edges threshold={20} color={t.line} />
-        </mesh>
-        {/* 顶面中缝（贴拱背曲面，分出左右键区域） */}
-        <SketchLine points={[[0, 0.071, -0.028], [0, 0.054, -0.1]]} />
-        {/* 前置滚轮（半嵌进拱背，点击亮灯） */}
-        <SketchCylinder args={[0.013, 0.013, 0.02, 12]} rotation={[0, 0, Math.PI / 2]} position={[0, 0.058, -0.07]} fill={ledOn ? ACCENT.mouse : undefined} />
-        {/* RGB 灯带环绕底座侧缘一圈，与椭圆底座融为一体 */}
-        <RgbRingStrip scale={[0.087, 1, 0.132]} height={0.014} position={[0, 0.011, 0]} active={ledOn} speed={0.55} />
-      </group>
+      {/* 椭圆薄底盘（手握部分与底座同一椭圆轮廓） */}
+      <mesh position={[0, 0.011, 0]} scale={[0.085, 1, 0.13]}>
+        <cylinderGeometry args={[1, 1, 0.022, 28]} />
+        <meshBasicMaterial color={t.fill} polygonOffset polygonOffsetFactor={1} polygonOffsetUnits={1} />
+        <Edges threshold={20} color={t.line} />
+      </mesh>
+      {/* 一体式拱背：从底盘顶缘一体升起的曲面，手握部分 */}
+      <mesh position={[0, 0.022, 0]} scale={[0.085, 0.05, 0.13]}>
+        <sphereGeometry args={[1, 28, 18, 0, Math.PI * 2, 0, Math.PI / 2]} />
+        <meshBasicMaterial color={t.fill} polygonOffset polygonOffsetFactor={1} polygonOffsetUnits={1} />
+        <Edges threshold={20} color={t.line} />
+      </mesh>
+      {/* 顶面中缝（贴拱背曲面，分出左右键区域） */}
+      <SketchLine points={[[0, 0.071, -0.028], [0, 0.054, -0.1]]} />
+      {/* 前置滚轮（半嵌进拱背，点击亮灯） */}
+      <SketchCylinder args={[0.013, 0.013, 0.02, 12]} rotation={[0, 0, Math.PI / 2]} position={[0, 0.058, -0.07]} fill={ledOn ? ACCENT.mouse : undefined} />
+      {/* RGB 灯带环绕底座侧缘一圈，与椭圆底座融为一体 */}
+      <RgbRingStrip scale={[0.087, 1, 0.132]} height={0.014} position={[0, 0.011, 0]} active={ledOn} speed={0.55} />
     </group>
   )
 }
