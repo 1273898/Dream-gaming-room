@@ -5,7 +5,7 @@ import { AdditiveBlending, SRGBColorSpace, TextureLoader, type Group } from 'thr
 import gsap from 'gsap'
 import { SketchBox, SketchCylinder, SketchLine, Ring, useTheme } from './linework'
 import { useInteractive } from './useInteractive'
-import { RgbStrip } from './RgbStrip'
+import { RgbRingStrip, RgbStrip } from './RgbStrip'
 import { ACCENT } from '../data/infos'
 import { NOVEL_COVERS } from '../data/novels'
 import { useStereoPlayer } from '../audio/useStereoPlayer'
@@ -100,8 +100,8 @@ function Mouse() {
         <SketchLine points={[[0, 0.071, -0.028], [0, 0.054, -0.1]]} />
         {/* 前置滚轮（半嵌进拱背，点击亮灯） */}
         <SketchCylinder args={[0.013, 0.013, 0.02, 12]} rotation={[0, 0, Math.PI / 2]} position={[0, 0.058, -0.07]} fill={ledOn ? ACCENT.mouse : undefined} />
-        {/* 尾部 RGB 灯带（竖直贴尾缘） */}
-        <RgbStrip size={[0.1, 0.015]} position={[0, 0.012, 0.132]} active={ledOn} speed={0.55} />
+        {/* RGB 灯带环绕底座侧缘一圈，与椭圆底座融为一体 */}
+        <RgbRingStrip scale={[0.087, 1, 0.132]} height={0.014} position={[0, 0.011, 0]} active={ledOn} speed={0.55} />
       </group>
     </group>
   )
