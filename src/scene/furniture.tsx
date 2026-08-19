@@ -65,7 +65,7 @@ function Keyboard() {
   )
 }
 
-/** 无线游戏鼠标：对称双键壳 + 滚轮凹槽，点击亮灯并按压回弹 */
+/** 游戏鼠标：一体式鹅卵石机身（椭圆底盘与拱背一体成型），前置滚轮 + 顶面中缝，点击亮灯并按压回弹 */
 function Mouse() {
   const t = useTheme()
   const [ledOn, setLedOn] = useState(false)
@@ -82,40 +82,26 @@ function Mouse() {
 
   return (
     <group ref={groupRef} position={[0.75, 0.81, 0.15]} {...bind}>
-      {/* 仅放大视觉子组，交互组保持 1:1 以保留无线鼠标的悬停和按压动画。 */}
+      {/* 仅放大视觉子组，交互组保持 1:1 以保留鼠标的悬停和按压动画。 */}
       <group scale={[2, 2, 2]}>
-        {/* 对称的低矮拱形底壳 */}
-        <mesh position={[0, 0.018, 0.004]} scale={[0.78, 0.43, 1.18]}>
-          <sphereGeometry args={[0.1, 24, 16]} />
+        {/* 椭圆薄底盘（手握部分与底座同一椭圆轮廓） */}
+        <mesh position={[0, 0.011, 0]} scale={[0.085, 1, 0.13]}>
+          <cylinderGeometry args={[1, 1, 0.022, 28]} />
           <meshBasicMaterial color={t.fill} polygonOffset polygonOffsetFactor={1} polygonOffsetUnits={1} />
+          <Edges threshold={20} color={t.line} />
         </mesh>
-        {/* 左键外壳 */}
-        <mesh position={[-0.037, 0.058, -0.052]} scale={[0.34, 0.17, 0.56]}>
-          <sphereGeometry args={[0.1, 20, 12]} />
+        {/* 一体式拱背：从底盘顶缘一体升起的曲面，手握部分 */}
+        <mesh position={[0, 0.022, 0]} scale={[0.085, 0.05, 0.13]}>
+          <sphereGeometry args={[1, 28, 18, 0, Math.PI * 2, 0, Math.PI / 2]} />
           <meshBasicMaterial color={t.fill} polygonOffset polygonOffsetFactor={1} polygonOffsetUnits={1} />
+          <Edges threshold={20} color={t.line} />
         </mesh>
-        {/* 右键外壳 */}
-        <mesh position={[0.037, 0.058, -0.052]} scale={[0.34, 0.17, 0.56]}>
-          <sphereGeometry args={[0.1, 20, 12]} />
-          <meshBasicMaterial color={t.fill} polygonOffset polygonOffsetFactor={1} polygonOffsetUnits={1} />
-        </mesh>
-        {/* 两枚按键之间的中央滚轮凹槽 */}
-        <SketchBox size={[0.042, 0.018, 0.096]} position={[0, 0.072, -0.048]} fill={t.dimmer} />
-        {/* 滚轮（点击亮灯） */}
-        <SketchCylinder
-          args={[0.016, 0.016, 0.032, 12]}
-          rotation={[0, 0, Math.PI / 2]}
-          position={[0, 0.086, -0.052]}
-          fill={ledOn ? ACCENT.mouse : undefined}
-        />
-        {/* 左侧侧键：前进与后退 */}
-        <SketchBox size={[0.014, 0.024, 0.034]} position={[-0.082, 0.039, -0.018]} fill={t.dimmer} />
-        <SketchBox size={[0.014, 0.024, 0.034]} position={[-0.082, 0.039, 0.032]} fill={t.dimmer} />
-        {/* 尾部 RGB 灯带 */}
-        <RgbStrip size={[0.11, 0.018]} position={[0, 0.07, 0.086]} rotation={[-Math.PI / 2, 0, 0]} active={ledOn} speed={0.55} />
-        {/* 底部脚贴 */}
-        <SketchBox size={[0.07, 0.008, 0.026]} position={[0, -0.019, -0.064]} fill={t.dimmer} />
-        <SketchBox size={[0.07, 0.008, 0.026]} position={[0, -0.019, 0.075]} fill={t.dimmer} />
+        {/* 顶面中缝（贴拱背曲面，分出左右键区域） */}
+        <SketchLine points={[[0, 0.071, -0.028], [0, 0.054, -0.1]]} />
+        {/* 前置滚轮（半嵌进拱背，点击亮灯） */}
+        <SketchCylinder args={[0.013, 0.013, 0.02, 12]} rotation={[0, 0, Math.PI / 2]} position={[0, 0.058, -0.07]} fill={ledOn ? ACCENT.mouse : undefined} />
+        {/* 尾部 RGB 灯带（竖直贴尾缘） */}
+        <RgbStrip size={[0.1, 0.015]} position={[0, 0.012, 0.132]} active={ledOn} speed={0.55} />
       </group>
     </group>
   )
@@ -568,6 +554,76 @@ export function SnackCabinet() {
   )
 }
 
+/** 猫砂盆：房间左下角的开放砂盆，点击铲屎——铲子插入猫砂、筛砂、铲走便便团，过一会儿便团会重新出现 */
+export function LitterBox() {
+  const scoopRef = useRef<Group>(null)
+  const clumpRef = useRef<Group>(null)
+  const [busy, setBusy] = useState(false)
+
+  const { groupRef, bind } = useInteractive(() => {
+    const scoop = scoopRef.current
+    const clump = clumpRef.current
+    if (!scoop || !clump || busy) return
+    setBusy(true)
+
+    gsap
+      .timeline()
+      // 铲子从砂盆中升起
+      .to(scoop.position, { y: 0.5, duration: 0.4, ease: 'power2.out' })
+      // 移到便便团上方
+      .to(scoop.position, { x: -0.05, z: 0.05, duration: 0.35, ease: 'power2.inOut' })
+      // 插入猫砂
+      .to(scoop.position, { y: 0, duration: 0.22, ease: 'power2.in' })
+      // 左右筛砂
+      .to(scoop.rotation, { z: 0.16, duration: 0.09, yoyo: true, repeat: 5, ease: 'sine.inOut' })
+      // 连砂带团铲起（便便团跟着铲子上升）
+      .to(scoop.position, { y: 0.42, duration: 0.4, ease: 'power2.out' })
+      .to(clump.position, { y: 0.52, duration: 0.4, ease: 'power2.out' }, '<')
+      // 便便团被扔走（缩小消失），同时铲子归位
+      .to(clump.scale, { x: 0, y: 0, z: 0, duration: 0.3, ease: 'power2.in' }, '+=0.15')
+      .to(scoop.position, { x: 0.26, z: 0.16, duration: 0.35, ease: 'power2.inOut' }, '<')
+      .to(scoop.position, { y: 0, duration: 0.3, ease: 'power2.in' })
+      .add(() => {
+        setBusy(false)
+        clump.position.set(-0.05, 0.075, 0.05)
+        // 过一会儿便便团重新出现
+        gsap.delayedCall(5, () => {
+          gsap.to(clump.scale, { x: 1, y: 1, z: 1, duration: 0.4, ease: 'back.out(2)' })
+        })
+      })
+  })
+
+  return (
+    // 左下角空地：避开书架（z -1.15 ~ -0.05）与猫的活动范围（x ≥ -3.4）；旋转让低矮的前壁（入口）朝向房间中间
+    <group ref={groupRef} position={[-4.1, 0, 2.6]} rotation={[0, 2.14, 0]} {...bind}>
+      {/* 隐形代理点击盒（砂盆较矮，扩大可点区域） */}
+      <mesh position={[0, 0.2, 0]}>
+        <boxGeometry args={[1.0, 0.5, 0.9]} />
+        <meshBasicMaterial colorWrite={false} depthWrite={false} />
+      </mesh>
+      {/* 盆底 + 四壁（前壁较低作入口） */}
+      <SketchBox size={[0.7, 0.04, 0.55]} position={[0, 0.02, 0]} />
+      <SketchBox size={[0.03, 0.18, 0.55]} position={[-0.335, 0.09, 0]} />
+      <SketchBox size={[0.03, 0.18, 0.55]} position={[0.335, 0.09, 0]} />
+      <SketchBox size={[0.7, 0.18, 0.03]} position={[0, 0.09, -0.26]} />
+      <SketchBox size={[0.7, 0.08, 0.03]} position={[0, 0.04, 0.26]} />
+      {/* 猫砂 */}
+      <SketchBox size={[0.62, 0.03, 0.47]} position={[0, 0.055, 0]} fill="#e8ddc0" />
+      {/* 便便团（铲屎动画的目标） */}
+      <group ref={clumpRef} position={[-0.05, 0.075, 0.05]}>
+        <SketchBox size={[0.07, 0.032, 0.055]} fill="#8d6e63" />
+        <SketchBox size={[0.045, 0.028, 0.04]} position={[0, 0.028, 0]} rotation={[0, 0.5, 0]} fill="#8d6e63" />
+      </group>
+      {/* 猫砂铲（斜插在盆角） */}
+      <group ref={scoopRef} position={[0.26, 0, 0.16]}>
+        <SketchBox size={[0.09, 0.02, 0.09]} position={[0, 0.085, 0]} />
+        <SketchBox size={[0.09, 0.035, 0.012]} position={[0, 0.095, -0.045]} />
+        <SketchCylinder args={[0.011, 0.011, 0.17, 8]} position={[0, 0.16, -0.045]} />
+      </group>
+    </group>
+  )
+}
+
 /** 全部家具 */
 export function Furniture() {
   return (
@@ -581,6 +637,7 @@ export function Furniture() {
       <Plant />
       <Fridge />
       <SnackCabinet />
+      <LitterBox />
     </group>
   )
 }
