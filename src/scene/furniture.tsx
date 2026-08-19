@@ -52,9 +52,15 @@ function Keyboard() {
         <planeGeometry args={[0.88, 0.32]} />
         <meshBasicMaterial color="#ffffff" transparent blending={AdditiveBlending} opacity={isNight ? 0.9 : 0.15} depthWrite={false} toneMapped={false} />
       </mesh>
-      {/* 键帽（RGB 点亮时键帽转深色，缝隙透出彩光） */}
+      {/* 键帽（RGB 点亮时键帽转深色 + 描边亮出键位轮廓，缝隙透出彩光） */}
       {keys.map((k, i) => (
-        <SketchBox key={i} size={[k.w, 0.035, 0.052]} position={[k.x, 0.058, k.z]} fill={rgbOn ? '#14141b' : undefined} />
+        <SketchBox
+          key={i}
+          size={[k.w, 0.035, 0.052]}
+          position={[k.x, 0.058, k.z]}
+          fill={rgbOn ? '#1b1b24' : undefined}
+          edge={rgbOn ? ACCENT.keyboard : undefined}
+        />
       ))}
       {/* 底座四周边缘 RGB 灯带（夜晚形成发光轮廓） */}
       <RgbStrip size={[0.92, 0.04]} position={[0, 0.02, 0.185]} active={rgbOn} speed={0.5} />

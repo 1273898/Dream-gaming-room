@@ -21,7 +21,9 @@ function R3fDebug() {
   const get = useThree((s) => s.get)
   useEffect(() => {
     if (import.meta.env.DEV) {
-      ;(window as unknown as { __r3f: unknown }).__r3f = get()
+      const w = window as unknown as { __r3f: unknown; __r3fGet: unknown }
+      w.__r3f = get()
+      w.__r3fGet = get
     }
   }, [get])
   return null
