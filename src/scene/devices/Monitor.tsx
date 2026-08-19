@@ -14,9 +14,9 @@ export function Monitor() {
 
   return (
     <group ref={groupRef} position={[2.0, 0, -3.45]} {...bind}>
-      {/* 底座 + 支架 */}
-      <SketchBox size={[0.42, 0.03, 0.26]} position={[0, 0.805, 0.1]} />
-      <SketchBox size={[0.08, 0.36, 0.05]} position={[0, 0.99, 0.12]} />
+      {/* 底座 + 支架（藏在屏幕框后面） */}
+      <SketchBox size={[0.42, 0.03, 0.26]} position={[0, 0.805, -0.08]} />
+      <SketchBox size={[0.08, 0.36, 0.05]} position={[0, 0.99, -0.08]} />
       {/* 屏幕框 */}
       <SketchBox size={[1.6, 0.95, 0.06]} position={[0, 1.45, 0]} />
       {on ? (
