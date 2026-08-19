@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Edges } from '@react-three/drei'
 import { useFrame, useLoader } from '@react-three/fiber'
-import { AdditiveBlending, SRGBColorSpace, TextureLoader, type Group } from 'three'
+import { AdditiveBlending, NormalBlending, SRGBColorSpace, TextureLoader, type Group, type Mesh, type MeshBasicMaterial } from 'three'
 import gsap from 'gsap'
 import { SketchBox, SketchCylinder, SketchLine, Ring, useTheme } from './linework'
 import { useInteractive } from './useInteractive'
@@ -127,7 +127,61 @@ function Speaker({ x }: { x: number }) {
   )
 }
 
-/** 电竞桌（含键盘、鼠标、音响、桌后 RGB 灯条） */
+/** 摇摆太阳花：太阳能摇头摆件，平时慢悠悠摇摆；点击疯狂加速摇摆几秒再慢下来 */
+function SwayFlower() {
+  const swayRef = useRef<Group>(null)
+  // 摇摆参数（gsap 直接动画这个普通对象，useFrame 每帧读取）
+  const sway = useRef({ amp: 0.1, speed: 1.6 })
+
+  const { groupRef, bind } = useInteractive(() => {
+    // 进入疯狂摇摆，两秒后慢慢缓回
+    gsap.to(sway.current, { amp: 0.5, speed: 9, duration: 0.3, ease: 'power2.out' })
+    gsap.to(sway.current, { amp: 0.1, speed: 1.6, duration: 2.2, delay: 2.2, ease: 'power2.inOut' })
+  })
+
+  useFrame(({ clock }) => {
+    if (!swayRef.current) return
+    const t = clock.elapsedTime * sway.current.speed
+    const amp = sway.current.amp
+    swayRef.current.rotation.z = Math.sin(t) * amp
+    swayRef.current.rotation.x = Math.cos(t * 0.7) * amp * 0.6
+  })
+
+  return (
+    // 桌面左前角（避开左音箱与显示器）
+    <group ref={groupRef} position={[-1.15, 0.79, 0.4]} {...bind}>
+      {/* 小花盆 */}
+      <SketchCylinder args={[0.05, 0.065, 0.09, 16]} position={[0, 0.045, 0]} />
+      {/* 摇摆部分：茎 + 叶 + 花头（绕盆口摇摆） */}
+      <group ref={swayRef} position={[0, 0.09, 0]}>
+        <SketchCylinder args={[0.007, 0.007, 0.2, 8]} position={[0, 0.1, 0]} />
+        {/* 两片小叶 */}
+        <SketchBox size={[0.05, 0.015, 0.02]} position={[-0.035, 0.08, 0]} rotation={[0, 0, 0.5]} />
+        <SketchBox size={[0.05, 0.015, 0.02]} position={[0.035, 0.12, 0]} rotation={[0, 0, -0.5]} />
+        {/* 花头（脸朝斜前方） */}
+        <group position={[0, 0.23, 0]} rotation={[-0.5, 0, 0]}>
+          {/* 花盘 */}
+          <SketchCylinder args={[0.045, 0.045, 0.018, 20]} rotation={[Math.PI / 2, 0, 0]} fill={ACCENT.gamepad} />
+          {/* 8 片花瓣 */}
+          {Array.from({ length: 8 }, (_, i) => {
+            const a = (i / 8) * Math.PI * 2
+            return (
+              <SketchBox
+                key={i}
+                size={[0.024, 0.05, 0.01]}
+                position={[Math.sin(a) * 0.075, Math.cos(a) * 0.075, 0]}
+                rotation={[0, 0, -a]}
+                fill={ACCENT.lamp}
+              />
+            )
+          })}
+        </group>
+      </group>
+    </group>
+  )
+}
+
+/** 电竞桌（含键盘、鼠标、音响、太阳花、桌后 RGB 灯条） */
 export function Desk() {
   return (
     <group position={[2.2, 0, -3.2]}>
@@ -142,6 +196,7 @@ export function Desk() {
       {/* 左右音响 */}
       <Speaker x={-1.2} />
       <Speaker x={1.2} />
+      <SwayFlower />
       {/* 桌后 RGB 灯条（贴墙，常亮流动） */}
       <RgbStrip size={[3, 0.05]} position={[0, 1.0, -0.68]} active speed={0.25} />
     </group>
@@ -685,6 +740,92 @@ export function WallClock() {
   )
 }
 
+/** Disco 派对球：悬挂在天花板，点击开始/停止旋转；旋转时地面扫过彩色光斑（夜晚更炫） */
+export function DiscoBall() {
+  const t = useTheme()
+  const isNight = useRoomStore((s) => s.isNight)
+  const [spinning, setSpinning] = useState(false)
+  const ballRef = useRef<Group>(null)
+  const spotRefs = useRef<(Mesh | null)[]>([])
+  const spin = useRef(0) // 当前角速度（平滑起步/停下）
+
+  const { groupRef, bind } = useInteractive(() => setSpinning((v) => !v))
+
+  useFrame(({ clock }, delta) => {
+    // 角速度平滑趋近目标
+    spin.current += ((spinning ? 1.8 : 0) - spin.current) * Math.min(1, delta * 2.5)
+    if (ballRef.current) ballRef.current.rotation.y += delta * spin.current
+    // 地面光斑：旋转时沿椭圆轨道漂移 + 呼吸，静止时淡出
+    const time = clock.elapsedTime
+    const k = Math.min(1, delta * 3)
+    spotRefs.current.forEach((m, i) => {
+      if (!m) return
+      const phase = (i / 6) * Math.PI * 2
+      m.position.x = Math.sin(time * 0.4 + phase) * 3.6
+      m.position.z = Math.cos(time * 0.3 + phase * 1.6) * 2.6
+      const mat = m.material as MeshBasicMaterial
+      // 加法混合在白色地板上会饱和不可见：白天用普通半透明色块，夜晚用加法发光
+      const wantBlending = isNight ? AdditiveBlending : NormalBlending
+      if (mat.blending !== wantBlending) {
+        mat.blending = wantBlending
+        mat.needsUpdate = true
+      }
+      const target = spinning ? 0.3 + 0.25 * Math.sin(time * 2.2 + phase * 2) : 0
+      mat.opacity += (target - mat.opacity) * k
+    })
+  })
+
+  return (
+    // 吊在沙发与电视之间的上空
+    <group
+      ref={groupRef}
+      position={[-1, 3.2, 0.5]}
+      {...bind}
+    >
+      {/* 隐形代理点击球（球体较小，扩大可点区域） */}
+      <mesh position={[0, -0.42, 0]}>
+        <sphereGeometry args={[0.5, 12, 10]} />
+        <meshBasicMaterial colorWrite={false} depthWrite={false} />
+      </mesh>
+      {/* 吊杆 */}
+      <SketchCylinder args={[0.012, 0.012, 0.12, 8]} position={[0, -0.06, 0]} />
+      {/* 球体 + 经纬环（disco 镜面分块感） */}
+      <group ref={ballRef} position={[0, -0.42, 0]}>
+        <mesh>
+          <sphereGeometry args={[0.26, 24, 18]} />
+          <meshBasicMaterial color={t.fill} polygonOffset polygonOffsetFactor={1} polygonOffsetUnits={1} />
+          <Edges threshold={20} color={t.line} />
+        </mesh>
+        <Ring radius={0.26} rotation={[Math.PI / 2, 0, 0]} />
+        <Ring radius={0.26} />
+        <Ring radius={0.26} rotation={[0, Math.PI / 2, 0]} />
+        <Ring radius={0.23} position={[0, 0.12, 0]} rotation={[Math.PI / 2, 0, 0]} />
+        <Ring radius={0.23} position={[0, -0.12, 0]} rotation={[Math.PI / 2, 0, 0]} />
+      </group>
+      {/* 彩色光斑（贴地面漂移，旋转时亮起；局部 y=-3.19 即贴地板） */}
+      {[0, 60, 120, 180, 240, 300].map((hue, i) => (
+        <mesh
+          key={hue}
+          ref={(m) => {
+            spotRefs.current[i] = m
+          }}
+          position={[0, -3.19, 0]}
+          rotation={[-Math.PI / 2, 0, 0]}
+        >
+          <circleGeometry args={[0.32, 20]} />
+          <meshBasicMaterial
+            color={`hsl(${hue}, 90%, 60%)`}
+            transparent
+            opacity={0}
+            depthWrite={false}
+            blending={AdditiveBlending}
+          />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
 /** 全部家具 */
 export function Furniture() {
   return (
@@ -700,6 +841,7 @@ export function Furniture() {
       <SnackCabinet />
       <LitterBox />
       <WallClock />
+      <DiscoBall />
     </group>
   )
 }
