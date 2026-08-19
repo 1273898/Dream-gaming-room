@@ -20,7 +20,7 @@ export function Monitor() {
       {/* 屏幕框 */}
       <SketchBox size={[1.6, 0.95, 0.06]} position={[0, 1.45, 0]} />
       {on ? (
-        <GameScreen variant="space" size={[1.5, 0.85]} position={[0, 1.45, 0.035]} />
+        <GameScreen variant="genshin" size={[1.5, 0.85]} position={[0, 1.45, 0.035]} />
       ) : (
         <group>
           <SketchPlane size={[1.5, 0.85]} position={[0, 1.45, 0.035]} fill={lit ? '#eaf4ff' : undefined} />

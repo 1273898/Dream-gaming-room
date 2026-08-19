@@ -1,5 +1,5 @@
 import { Canvas, useThree } from '@react-three/fiber'
-import { Suspense, useEffect } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { CameraRig } from './camera/CameraRig'
 import { Room } from './scene/Room'
 import { Furniture } from './scene/furniture'
@@ -9,6 +9,7 @@ import { Cat } from './scene/Cat'
 import { FloatingLyrics, LyricFontPreload } from './scene/FloatingLyrics'
 import { Hud } from './ui/Hud'
 import { StereoConsole } from './ui/StereoConsole'
+import { GuestbookModal } from './ui/GuestbookModal'
 import { useTheme } from './scene/linework'
 
 function SceneBackground() {
@@ -30,6 +31,14 @@ function R3fDebug() {
 }
 
 export default function App() {
+  const [guestbookOpen, setGuestbookOpen] = useState(false)
+
+  // 进入场景 10 秒后自动弹出留言板（每次加载只弹一次，关闭后不再弹出）
+  useEffect(() => {
+    const timer = setTimeout(() => setGuestbookOpen(true), 10000)
+    return () => clearTimeout(timer)
+  }, [])
+
   return (
     <>
       <Canvas camera={{ fov: 40, position: [13, 9, 15], near: 0.1, far: 100 }}>
@@ -48,6 +57,7 @@ export default function App() {
       </Canvas>
       <Hud />
       <StereoConsole />
+      <GuestbookModal open={guestbookOpen} onClose={() => setGuestbookOpen(false)} />
     </>
   )
 }

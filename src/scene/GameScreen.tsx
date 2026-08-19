@@ -72,70 +72,61 @@ function drawFrame(ctx: CanvasRenderingContext2D, time: number) {
   ctx.fill()
 }
 
-/** 画一帧太空射击游戏画面 */
-function drawSpace(ctx: CanvasRenderingContext2D, time: number) {
-  // 深空
-  ctx.fillStyle = '#04040c'
+const easeOutCubic = (x: number) => 1 - Math.pow(1 - x, 3)
+const easeOutBack = (x: number) => 1 + 2.70158 * Math.pow(x - 1, 3) + 1.70158 * Math.pow(x - 1, 2)
+
+/** 画一帧「原神启动」经典画面：纯白底 + 大标题淡入 + 「启动！」盖章砸入（循环） */
+function drawGenshin(ctx: CanvasRenderingContext2D, time: number) {
+  const T = 3.4 // 一轮周期（秒）
+  const t = time % T
+  const FONT = `'Microsoft YaHei', 'PingFang SC', 'Noto Sans SC', sans-serif`
+
+  // 纯白底
+  ctx.fillStyle = '#ffffff'
   ctx.fillRect(0, 0, W, H)
 
-  // 星星（两层视差滚动）
-  for (let layer = 0; layer < 2; layer++) {
-    const speed = layer === 0 ? 10 : 26
-    const size = layer === 0 ? 1 : 2
-    ctx.fillStyle = layer === 0 ? '#3a4a6a' : '#cfe0ff'
-    for (let i = 0; i < 26; i++) {
-      const seed = i * 37 + layer * 91
-      const x = (((seed * 53) % W) + W - ((time * speed) % W)) % W
-      const y = (seed * 29) % H
-      ctx.fillRect(x, y, size, size)
-    }
+  // 「启动！」砸入瞬间的轻微震屏
+  const shake = t > 1.1 && t < 1.3 ? Math.sin(t * 90) * 2.5 * (1 - (t - 1.1) / 0.2) : 0
+
+  ctx.save()
+  ctx.translate(W / 2 + shake, H / 2 + shake * 0.6)
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillStyle = '#111111'
+
+  // 「原神」淡入，随后轻微呼吸
+  const inT = Math.min(1, t / 0.45)
+  const breathe = 1 + Math.sin(time * 2.2) * 0.012
+  ctx.globalAlpha = inT
+  ctx.save()
+  ctx.scale((0.86 + 0.14 * easeOutCubic(inT)) * breathe, (0.86 + 0.14 * easeOutCubic(inT)) * breathe)
+  ctx.font = `900 54px ${FONT}`
+  ctx.fillText('原神', 0, -16)
+  ctx.restore()
+
+  // 「启动！」在 1.1s 时盖章式砸入（带回弹）
+  if (t > 1.1) {
+    const st = Math.min(1, (t - 1.1) / 0.22)
+    const s = 1 + 0.8 * (1 - easeOutBack(st)) // 从 1.8 倍砸到 1，带回弹
+    ctx.globalAlpha = Math.min(1, st * 2)
+    ctx.save()
+    ctx.scale(s, s)
+    ctx.font = `900 30px ${FONT}`
+    ctx.fillText('启 动 ！', 0, 40)
+    ctx.restore()
   }
+  ctx.restore()
 
-  // 敌舰（红色三角，缓慢盘旋下降）
-  const ex = W * 0.3 + Math.sin(time * 0.5) * 24
-  const ey = ((time * 18) % (H * 1.5)) - 20
-  ctx.fillStyle = '#ef4444'
-  ctx.beginPath()
-  ctx.moveTo(ex, ey + 8)
-  ctx.lineTo(ex - 7, ey - 6)
-  ctx.lineTo(ex + 7, ey - 6)
-  ctx.fill()
-
-  // 第二艘敌舰（错位）
-  const ex2 = W * 0.7 + Math.cos(time * 0.4) * 20
-  const ey2 = (((time + 3) * 15) % (H * 1.5)) - 20
-  ctx.fillStyle = '#f97316'
-  ctx.beginPath()
-  ctx.moveTo(ex2, ey2 + 7)
-  ctx.lineTo(ex2 - 6, ey2 - 5)
-  ctx.lineTo(ex2 + 6, ey2 - 5)
-  ctx.fill()
-
-  // 玩家飞船（底部，左右游走）
-  const sx = W * 0.5 + Math.sin(time * 0.9) * W * 0.22
-  const sy = H - 18
-  ctx.fillStyle = '#7cc4ff'
-  ctx.beginPath()
-  ctx.moveTo(sx, sy - 9)
-  ctx.lineTo(sx - 8, sy + 7)
-  ctx.lineTo(sx + 8, sy + 7)
-  ctx.fill()
-  // 尾焰
-  ctx.fillStyle = '#fbbf24'
-  ctx.fillRect(sx - 2, sy + 8, 4, 3 + Math.sin(time * 20) * 2)
-
-  // 子弹（循环上升）
-  ctx.fillStyle = '#fef08a'
-  for (let k = 0; k < 3; k++) {
-    const by = sy - ((time * 140 + k * 60) % (H + 20))
-    const bx = W * 0.5 + Math.sin((time - (H - by) / 140) * 0.9) * W * 0.22
-    ctx.fillRect(bx - 1, by, 2, 6)
+  // 结尾淡出到白，进入下一轮
+  if (t > T - 0.5) {
+    ctx.fillStyle = `rgba(255,255,255,${(t - (T - 0.5)) / 0.5})`
+    ctx.fillRect(0, 0, W, H)
   }
 }
 
 /**
  * 播放游戏画面的屏幕（Canvas 动态纹理）
- * variant: platformer 横版跳跃 / space 太空射击
+ * variant: platformer 横版跳跃 / genshin 原神启动
  */
 export function GameScreen({
   size,
@@ -146,11 +137,11 @@ export function GameScreen({
   size: [number, number]
   position?: V3
   rotation?: V3
-  variant?: 'platformer' | 'space'
+  variant?: 'platformer' | 'genshin'
 }) {
   const acc = useRef(0)
   const time = useRef(0)
-  const draw = variant === 'space' ? drawSpace : drawFrame
+  const draw = variant === 'genshin' ? drawGenshin : drawFrame
 
   const { texture, ctx } = useMemo(() => {
     const canvas = document.createElement('canvas')

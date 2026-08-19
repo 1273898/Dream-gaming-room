@@ -126,3 +126,194 @@ canvas {
   background: #7ef9ff;
   color: #121218;
 }
+
+/* ---------- 访客留言弹窗 ---------- */
+.guestbook-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(26, 26, 26, 0);
+  backdrop-filter: blur(0px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s, background 0.35s, backdrop-filter 0.35s;
+  z-index: 20;
+}
+
+.guestbook-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+  background: rgba(26, 26, 26, 0.18);
+  backdrop-filter: blur(3px);
+}
+
+.guestbook-card {
+  display: flex;
+  flex-direction: column;
+  width: min(400px, 100%);
+  max-height: min(560px, 100%);
+  padding: 16px 18px;
+  border: 1.5px solid #1a1a1a;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.96);
+  color: #1a1a1a;
+  transform: translateY(24px) scale(0.97);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s;
+}
+
+.guestbook-overlay.open .guestbook-card {
+  transform: none;
+}
+
+.guestbook-overlay.night .guestbook-card {
+  border-color: #7ef9ff;
+  background: rgba(18, 18, 32, 0.94);
+  color: #eafcff;
+  box-shadow: 0 0 18px rgba(126, 249, 255, 0.35), 0 0 34px rgba(168, 85, 247, 0.25);
+}
+
+.guestbook-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.guestbook-head strong {
+  font-size: 15px;
+  letter-spacing: 2px;
+}
+
+.guestbook-close {
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  padding: 2px 6px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.guestbook-close:hover {
+  opacity: 1;
+}
+
+.guestbook-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed currentColor;
+}
+
+.guestbook-form input,
+.guestbook-form textarea {
+  border: 1px solid currentColor;
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  padding: 8px 10px;
+  resize: none;
+  outline: none;
+}
+
+.guestbook-form input::placeholder,
+.guestbook-form textarea::placeholder {
+  color: inherit;
+  opacity: 0.45;
+}
+
+.guestbook-form-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.guestbook-count {
+  font-size: 11px;
+  opacity: 0.5;
+}
+
+.guestbook-form-foot button {
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  padding: 5px 14px;
+  transition: background 0.2s, color 0.2s, opacity 0.2s;
+}
+
+.guestbook-form-foot button:hover:not(:disabled) {
+  background: #1a1a1a;
+  color: #fff;
+}
+
+.guestbook-overlay.night .guestbook-form-foot button:hover:not(:disabled) {
+  background: #7ef9ff;
+  color: #121218;
+}
+
+.guestbook-form-foot button:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+.guestbook-error {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: #f43f5e;
+}
+
+.guestbook-list {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0 2px 0 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.guestbook-list li {
+  font-size: 13px;
+}
+
+.guestbook-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.guestbook-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: #e879f9;
+}
+
+.guestbook-time {
+  font-size: 11px;
+  opacity: 0.45;
+}
+
+.guestbook-list p {
+  margin: 0;
+  word-break: break-word;
+}
+
+.guestbook-tip {
+  text-align: center;
+  opacity: 0.5;
+  font-size: 12px;
+  padding: 8px 0;
+}
