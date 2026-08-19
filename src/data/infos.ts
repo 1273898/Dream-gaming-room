@@ -9,4 +9,5 @@ export const ACCENT = {
   lamp: '#fbbf24',
   fridge: '#93c5fd',
   book: '#f472b6',
+  clock: '#fb7185',
 } as const

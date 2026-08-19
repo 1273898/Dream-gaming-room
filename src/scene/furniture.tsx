@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Edges } from '@react-three/drei'
-import { useLoader } from '@react-three/fiber'
+import { useFrame, useLoader } from '@react-three/fiber'
 import { AdditiveBlending, SRGBColorSpace, TextureLoader, type Group } from 'three'
 import gsap from 'gsap'
 import { SketchBox, SketchCylinder, SketchLine, Ring, useTheme } from './linework'
@@ -621,6 +621,70 @@ export function LitterBox() {
   )
 }
 
+/** 挂钟：圆形钟面 + 12 刻度，时针/分针/秒针按真实时间实时走动；点击钟面轻轻晃动 */
+export function WallClock() {
+  const hourRef = useRef<Group>(null)
+  const minuteRef = useRef<Group>(null)
+  const secondRef = useRef<Group>(null)
+
+  const { groupRef, bind } = useInteractive(() => {
+    if (!groupRef.current) return
+    // 碰一下钟面，轻轻晃动后回正
+    gsap.fromTo(
+      groupRef.current.rotation,
+      { z: 0.09 },
+      { z: 0, duration: 1.4, ease: 'elastic.out(3, 0.25)' },
+    )
+  })
+
+  // 每帧同步真实时间（秒针平滑扫动）
+  useFrame(() => {
+    const now = new Date()
+    const s = now.getSeconds() + now.getMilliseconds() / 1000
+    const m = now.getMinutes() + s / 60
+    const h = (now.getHours() % 12) + m / 60
+    if (secondRef.current) secondRef.current.rotation.z = -(s / 60) * Math.PI * 2
+    if (minuteRef.current) minuteRef.current.rotation.z = -(m / 60) * Math.PI * 2
+    if (hourRef.current) hourRef.current.rotation.z = -(h / 12) * Math.PI * 2
+  })
+
+  return (
+    // 挂在后墙：电视（x≤-1.0）与海报（x≥1.0）之间的空白处
+    <group ref={groupRef} position={[0.2, 2.5, -3.93]} {...bind}>
+      {/* 钟面圆盘（圆柱轴向朝房间内） */}
+      <SketchCylinder args={[0.36, 0.36, 0.04, 32]} rotation={[Math.PI / 2, 0, 0]} />
+      {/* 12 个刻度（整点刻度更长） */}
+      {Array.from({ length: 12 }, (_, i) => {
+        const a = (i / 12) * Math.PI * 2
+        const inner = i % 3 === 0 ? 0.27 : 0.3
+        return (
+          <SketchLine
+            key={i}
+            points={[
+              [Math.sin(a) * inner, Math.cos(a) * inner, 0.025],
+              [Math.sin(a) * 0.325, Math.cos(a) * 0.325, 0.025],
+            ]}
+          />
+        )
+      })}
+      {/* 时针 */}
+      <group ref={hourRef}>
+        <SketchBox size={[0.024, 0.17, 0.008]} position={[0, 0.055, 0.028]} />
+      </group>
+      {/* 分针 */}
+      <group ref={minuteRef}>
+        <SketchBox size={[0.016, 0.25, 0.008]} position={[0, 0.095, 0.033]} />
+      </group>
+      {/* 秒针（醒目色，平滑扫动） */}
+      <group ref={secondRef}>
+        <SketchBox size={[0.012, 0.29, 0.005]} position={[0, 0.085, 0.038]} fill={ACCENT.clock} />
+      </group>
+      {/* 中心轴帽 */}
+      <SketchCylinder args={[0.02, 0.02, 0.03, 12]} rotation={[Math.PI / 2, 0, 0]} position={[0, 0, 0.03]} />
+    </group>
+  )
+}
+
 /** 全部家具 */
 export function Furniture() {
   return (
@@ -635,6 +699,7 @@ export function Furniture() {
       <Fridge />
       <SnackCabinet />
       <LitterBox />
+      <WallClock />
     </group>
   )
 }
